@@ -38,21 +38,6 @@ void set_bit(uint16_t *piece, uint8_t pos, uint8_t val)
 		*piece &= ~(1 << pos);
 }
 
-uint16_t piece_get_row(uint16_t piece, uint8_t row)
-{
-	uint16_t t_row = *piece;
-	uint16_t row = t_row;
-	row &= (PIECE_ROW_BITMASK << (row*PIECE_ROW_DIFF));
-
-	if(!row)
-		return 0;
-	
-	while(!(row & PIECE_ROW_BITMASK))
-		row = row>> PIECE_ROW_DIFF;
-
-	return row;
-}
-
 static void flip_v(uint16_t *piece)
 {
 	int i;
