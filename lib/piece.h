@@ -1,53 +1,124 @@
+/**
+ * Use this interface to set and get values from the tetris piece data structure
+ *
+ * Other mutators that may be of use can be found in piece_logic.h
+ */
+
 #include <stdint.h>
 
-#define PIECE_SIZE 16
-#define PIECE_EDGE_SIZE 4
+#define PIECE_ROTATION_MASK         0x18 
+#define PIECE_ROTATION_BIT_POSITION	3
 
-#define PIECE_FIRST_ROW_INDEX 0
-#define PIECE_SECOND_ROW_INDEX 1
-#define PIECE_THIRD_ROW_INDEX 2
-#define PIECE_FOURTH_ROW_INDEX 3
+#define PIECE_TYPE_MASK             0x7
+#define PIECE_TYPE_BIT_POSITION     0
 
-#define PIECE_ROW_DIFF 4
-#define PIECE_COL_DIFF 1
+#define PIECE_X_MASK                0x1E00
+#define PIECE_X_BIT_POSITION        10
 
-#define PIECE_FIRST_ROW_BITMASK 0x000F
-#define PIECE_LAST_ROW_BITMASK 0xF000
+#define PIECE_Y_MASK                0x1F0
+#define PIECE_Y_BIT_POSITION        5
 
-#define PIECE_ROW_BITMASK 0x000F
+#define PIECE_EXTRA_1_MASK          0x2000
+#define PIECE_EXTRA_1_BIT_POSITION  14
+
+#define PIECE_EXTRA_2_MASK          0x4000
+#define PIECE_EXTRA_2_BIT_POSITION  15
 
 /**
- * Rotates the piece clockwise by 90 degrees
- *
- * piece = pointer to a piece
- **/
-extern void rotate_r(uint16_t *piece);
-/**
- * Rotates the piece counter-clockwise by 90 degrees
- *  
- * piece = pointer to a piece
- **/
-extern void rotate_l(uint16_t *piece);
-/**
- * Moves rows up until top row is no longer all 0s. Should ideally be called
- * after #rotate_r or #rotate_l so that pieces don't seem to "move down" after
- * rotation.
- *
- * piece = pointer to a piece
+ * Returns a piece with Y at max value, X centered, with a random piece and
+ * random rotation.
  */
-extern void move_up(uint16_t *piece);
+extern uint16_t piece_auto_initialize();
 /**
- * Sets a value of a bit in the piece.
+ * Returns the number associated with the piece type.
+ * Only 7 types are supported but can support up to 8.
  *
- * piece = pointer to a piece
- * pos = the position of the bit to set, which is between 0 and 15 inclusive
- * val = the value to set the bit. Should either be 0 or 1
+ * returns value between 0 and 6 (inclusive)
  */
-extern void set_bit(uint16_t *piece, uint8_t pos, uint8_t val);
+extern uint16_t piece_get_piece(uint16_t *piece);
 /**
- * Gets the value of a bit in the piece
+ * a piece type with a random piece with all other data untouched
  *
- * piece = pointer to a piece
- * Returns the value of the bit
+ * piece = original piece to change the piece of
  */
-extern uint8_t get_bit(uint16_t *piece, uint8_t pos);
+extern void piece_set_piece(uint16_t *piece, uint16_t type);
+
+/**
+ * Returns the number associated with the orientation.
+ * Can return 4 different numbers
+ *
+ * returns value between 0 and 3 (inclusive)
+ */
+extern uint16_t piece_get_rotation(uint16_t *piece);
+/**
+ * Return a piece rotation with a random orientation with all other data untouched
+ *
+ * piece = original piece to change rotation of
+ * orientation = 0 for no rotation, 1 for 90 degree, 2 for 180, and 3 for
+ *               270 degrees
+ */
+extern void piece_set_rotation(uint16_t *piece, uint16_t orientation);
+
+/**
+ * Gets the value of the horizontal position.
+ *
+ * piece = pointer to the piece to get the horizontal position of
+ * returns a value between 0 and 15.
+ */
+extern uint16_t piece_get_h(uint16_t *piece);
+
+/**
+ * Sets the value of the horizontal position.
+ * The expected value is between 0 and 15
+ *
+ * piece = pointer to the piece to change horizontal position of
+ * pos = must be between 0 and 15 (inclusive)
+ */
+extern void piece_set_h(uint16_t *piece, uint16_t pos);
+
+/**
+ * Gets the value of the vertical position.
+ *
+ * piece = pointer to the piece to get the horizontal position of
+ * returns a value between 0 and 31 (inclusive).
+ */
+extern uint16_t piece_get_v(uint16_t *piece);
+
+/**
+ * Sets the value of the vertical position.
+ * The expected value is between 0 and 31.
+ *
+ * piece = pointer to the piece to change rotation of
+ * pos = must be between 0 and 31 (inclusive)
+ */
+extern void piece_set_v(uint16_t *piece, uint16_t pos);
+
+/**
+ * Gets the value of the extra bit in position 14 (or the 15th bit)
+ *
+ * piece = pointer to piece
+ */
+extern uint16_t piece_get_ex_1(uint16_t *piece);
+
+/**
+ * Sets the value of the extra bit in position 14 (or the 15th bit)
+ *
+ * piece = pointer to piece
+ * value = if value is zero, sets bit on. Otherwise, sets bit off
+ */
+extern void piece_set_ex_1(uint16_t *piece, uint16_t value);
+
+/**
+ * Gets the value of the extra bit in position 14 (or the 15th bit)
+ *
+ * piece = pointer to piece
+ */
+extern uint16_t piece_get_ex_2(uint16_t *piece);
+
+/**
+ * Sets the value of the extra bit in position 15 (or the 16th bit)
+ *
+ * piece = pointer to piece
+ * value = if value is zero, sets bit on. Otherwise, sets bit off
+ */
+extern void piece_set_ex_2(uint16_t *piece, uint16_t value);

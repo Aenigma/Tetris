@@ -1,88 +1,71 @@
-#include <stdint.h>
-#include <stdio.h>
-#include "piece.h"
-static void transpose(uint16_t *piece);
-static void flip_v(uint16_t *piece);
-static void flip_h(uint16_t *piece);
-static void swap_bit(uint16_t *piece, uint8_t x, uint8_t y);
-
-
-void rotate_l(uint16_t *piece)
-{
-	transpose(piece);
-	flip_v(piece);
-}
-
-void rotate_r(uint16_t *piece)
-{
-	transpose(piece);
-	flip_h(piece);
-}
-
-void move_up(uint16_t *piece)
-{
-	while(*piece && !(*piece & PIECE_FIRST_ROW_BITMASK))
-		*piece = *piece >> PIECE_ROW_DIFF;
-}
-
-uint8_t get_bit(uint16_t *piece, uint8_t pos)
-{
-	return ((*piece) >> pos) & 1;
-}
-
-void set_bit(uint16_t *piece, uint8_t pos, uint8_t val)
-{
-	if(val)
-		*piece |= 1 << pos;
-	else
-		*piece &= ~(1 << pos);
-}
-
-static void flip_v(uint16_t *piece)
-{
-	int i;
-	for (i = 0; i < PIECE_ROW_DIFF; i += PIECE_COL_DIFF) {
-		swap_bit(piece, i, i+(PIECE_ROW_DIFF*3));
-		swap_bit(piece, i+PIECE_ROW_DIFF, i+(PIECE_ROW_DIFF*2));
-	}
-}
-
-static void flip_h(uint16_t *piece)
-{
-	int i;
-	for (i = 0; i < PIECE_SIZE; i+= PIECE_ROW_DIFF) {
-		swap_bit(piece, i, i+(PIECE_COL_DIFF*3));
-		swap_bit(piece, i+PIECE_COL_DIFF, i+(PIECE_COL_DIFF*2));
-	}
-}
-static void swap_bit(uint16_t *piece, uint8_t x, uint8_t y)
-{
-	uint8_t x2 = get_bit(piece,x);
-	uint8_t y2 = get_bit(piece,y);
-	set_bit(piece, y, x2);
-	set_bit(piece, x, y2);
-}
-
 /**
-* Based off algorithm here:
-* http://en.wikipedia.org/wiki/In-place_matrix_transposition#Square_matrices
-* for n = 0 to N - 2
-*   for m = n + 1 to N - 1
-*     swap A(n,m) with A(m,n)
-*/
-static void transpose(uint16_t *piece)
+ * Implements functionalities of piece.h by using piece_logic.h
+ *
+ * Includes getter/setters for convenience and implemented in pure C.
+ *
+ * Other mutators that may be of use can be found in piece_logic.c
+ */
+#include <stdint.h>
+#include <stdlib.h>
+#include <time.h>
+#include "piece.h"
+#include "piece_logic.h"
+
+/* Equivalent to 00_0101_10110_00_000 */
+#define PIECE_CENTERED_X_MAX_Y 0x16c0 
+
+
+uint16_t piece_auto_initialize()
 {
-	int i;
-	int j;
-	int n = 1;
-	int m = 3;
-
-	do { 
-		for (i = n, j = 1; i < (n+m); ++i, ++j) {
-			swap_bit(piece, i, i+(3*j));
-		}
-		n += 5;
-		--m;
-	} while(n < 16);
+	uint16_t piece = PIECE_CENTERED_X_MAX_Y;	
+	piece |= rand() % (PIECE_TYPE_MASK | PIECE_ROTATION_MASK);
+	return piece;
 }
-
+uint16_t piece_get_piece(uint16_t *piece)
+{
+	return (*piece & PIECE_TYPE_MASK) >> PIECE_TYPE_BIT_POSITION;
+}
+void piece_set_piece(uint16_t *piece, uint16_t type)
+{
+	piece_set_with_mask(piece, PIECE_TYPE_MASK, type << PIECE_TYPE_BIT_POSITION);
+}
+uint16_t piece_get_rotation(uint16_t *piece)
+{
+	return (*piece & PIECE_ROTATION_MASK) >> PIECE_ROTATION_BIT_POSITION;
+}
+void piece_set_rotation(uint16_t *piece, uint16_t orientation)
+{
+	piece_set_with_mask(piece, PIECE_ROTATION_MASK, orientation << PIECE_ROTATION_BIT_POSITION);
+}
+uint16_t piece_get_h(uint16_t *piece)
+{
+	return (*piece & PIECE_X_MASK) >> PIECE_X_BIT_POSITION;
+}
+void piece_set_h(uint16_t *piece, uint16_t pos)
+{
+	piece_set_with_mask(piece, PIECE_X_MASK, pos << PIECE_X_BIT_POSITION);
+}
+uint16_t piece_get_v(uint16_t *piece)
+{
+	return (*piece & PIECE_Y_MASK) >> PIECE_Y_BIT_POSITION;
+}
+void piece_set_v(uint16_t *piece, uint16_t pos)
+{
+	piece_set_with_mask(piece, PIECE_Y_MASK, pos << PIECE_Y_BIT_POSITION);
+}
+uint16_t piece_get_ex_1(uint16_t *piece)
+{ 
+	return (*piece & PIECE_EXTRA_1_MASK) >> PIECE_EXTRA_1_BIT_POSITION;
+}
+void piece_set_ex_1(uint16_t *piece, uint16_t value)
+{
+	piece_set_with_mask(piece, PIECE_EXTRA_1_MASK, value << PIECE_EXTRA_1_BIT_POSITION);
+}
+uint16_t piece_get_ex_2(uint16_t *piece)
+{ 
+	return (*piece & PIECE_EXTRA_2_MASK) >> PIECE_EXTRA_2_BIT_POSITION;
+}
+void piece_set_ex_2(uint16_t *piece, uint16_t value)
+{
+	piece_set_with_mask(piece, PIECE_EXTRA_2_MASK, value << PIECE_EXTRA_2_BIT_POSITION);
+}
