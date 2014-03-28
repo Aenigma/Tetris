@@ -1,3 +1,9 @@
+/**
+ * This file does does simple tests to verify the correctness of piece_logic.c
+ *
+ * It verifies that one can modify individual bits, set with a mask, and
+ * rotation.
+ */
 #include <stdio.h>
 #include <stdint.h>
 #include "lib/piece_logic.h"

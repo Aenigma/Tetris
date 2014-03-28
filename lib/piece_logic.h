@@ -1,3 +1,8 @@
+/**
+ * This file defines the core functionality required for modifying a piece.
+ * Functions should primarily use these functions to provide nearly all
+ * modifications to the piece.
+ */
 #include <stdint.h>
 
 /**
